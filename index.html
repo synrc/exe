@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="SH : Erlang Shell Executor" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>SH</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/synrc/sh">View on GitHub</a>
+
+          <h1 id="project_title">SH</h1>
+          <h2 id="project_tagline">Erlang Shell Executor</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/synrc/sh/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/synrc/sh/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="sh-executor" class="anchor" href="#sh-executor"><span class="octicon octicon-link"></span></a>SH Executor</h1>
+
+<p>Family of functions and ports involving interacting with the system shell,
+paths and external programs.</p>
+
+<h2>
+<a name="reason" class="anchor" href="#reason"><span class="octicon octicon-link"></span></a>Reason</h2>
+
+<div class="highlight highlight-erlang"><pre><span class="o">&gt;</span> <span class="nv">Email</span> <span class="o">=</span> <span class="s">"hacker+/somepath&amp;reboot#@example.com"</span><span class="p">.</span> <span class="c">% this is a valid email!</span>
+<span class="o">&gt;</span> <span class="nn">os</span><span class="p">:</span><span class="nf">cmd</span><span class="p">([</span><span class="s">"mkdir -p "</span><span class="p">,</span> <span class="nv">Email</span><span class="p">]).</span>
+<span class="c">% path clobbering and a reboot may happen here!</span>
+</pre></div>
+
+<h2>
+<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h2>
+
+<h3>
+<a name="onliners" class="anchor" href="#onliners"><span class="octicon octicon-link"></span></a>Onliners</h3>
+
+<div class="highlight highlight-erlang"><pre><span class="o">&gt;</span> <span class="nn">erlsh</span><span class="p">:</span><span class="nf">oneliner</span><span class="p">([</span><span class="s">"touch"</span><span class="p">,</span> <span class="nn">filename</span><span class="p">:</span><span class="nf">join</span><span class="p">(</span><span class="s">"/tmp/"</span><span class="p">,</span> <span class="nv">Path</span><span class="p">)]).</span>
+<span class="p">{</span><span class="n">done</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">&lt;&lt;&gt;&gt;</span><span class="p">}</span>
+
+<span class="o">&gt;</span> <span class="nn">erlsh</span><span class="p">:</span><span class="nf">oneliner</span><span class="p">(</span><span class="s">"uname -v"</span><span class="p">).</span> <span class="c">% oneliner/1,2 funs do not include newlines</span>
+<span class="p">{</span><span class="n">done</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span>
+      <span class="o">&lt;&lt;</span><span class="s">"Darwin Kernel Version 12.4.0: Wed May  1 17:57:12 PDT 2013; root:xnu-2050.24.15~1/RELEASE_X86_64"</span><span class="o">&gt;&gt;</span><span class="p">}</span>
+
+<span class="o">&gt;</span> <span class="nn">erlsh</span><span class="p">:</span><span class="nf">oneliner</span><span class="p">(</span><span class="s">"git describe --always"</span><span class="p">).</span>
+<span class="p">{</span><span class="n">done</span><span class="p">,</span><span class="mi">128</span><span class="p">,</span><span class="o">&lt;&lt;</span><span class="s">"fatal: Not a valid object name HEAD"</span><span class="o">&gt;&gt;</span><span class="p">}</span>
+
+<span class="o">&gt;</span> <span class="nn">erlsh</span><span class="p">:</span><span class="nf">oneliner</span><span class="p">(</span><span class="s">"git describe --always"</span><span class="p">,</span> <span class="s">"/tank/proger/vxz/otp"</span><span class="p">).</span>
+<span class="p">{</span><span class="n">done</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">&lt;&lt;</span><span class="s">"OTP_R16B01"</span><span class="o">&gt;&gt;</span><span class="p">}</span>
+</pre></div>
+
+<h3>
+<a name="escaping" class="anchor" href="#escaping"><span class="octicon octicon-link"></span></a>Escaping</h3>
+
+<div class="highlight highlight-erlang"><pre><span class="o">&gt;</span> <span class="nv">Path</span> <span class="o">=</span> <span class="nn">erlsh_path</span><span class="p">:</span><span class="nf">escape</span><span class="p">(</span><span class="s">"email+=/subdir@example.com"</span><span class="p">).</span>
+<span class="s">"email+=%2Fsubdir@example.com"</span>
+</pre></div>
+
+<h3>
+<a name="run" class="anchor" href="#run"><span class="octicon octicon-link"></span></a>Run</h3>
+
+<div class="highlight highlight-erlang"><pre><span class="o">&gt;</span> <span class="nn">erlsh</span><span class="p">:</span><span class="nf">run</span><span class="p">([</span><span class="s">"git"</span><span class="p">,</span> <span class="s">"clone"</span><span class="p">,</span> <span class="s">"https://github.com/proger/darwinkit.git"</span><span class="p">],</span> <span class="n">binary</span><span class="p">,</span> <span class="s">"/tmp"</span><span class="p">).</span>
+<span class="p">{</span><span class="n">done</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">&lt;&lt;</span><span class="s">"Cloning into 'darwinkit'...</span><span class="se">\n</span><span class="s">"</span><span class="o">&gt;&gt;</span><span class="p">}</span>
+
+<span class="o">&gt;</span> <span class="nv">UserUrl</span> <span class="o">=</span> <span class="s">"https://github.com/proger/darwinkit.git"</span><span class="p">.</span>
+<span class="s">"https://github.com/proger/darwinkit.git"</span>
+<span class="o">&gt;</span> <span class="nn">erlsh</span><span class="p">:</span><span class="nf">run</span><span class="p">([</span><span class="s">"git"</span><span class="p">,</span> <span class="s">"clone"</span><span class="p">,</span> <span class="nv">UserUrl</span><span class="p">],</span> <span class="n">binary</span><span class="p">,</span> <span class="s">"/tmp"</span><span class="p">).</span>
+<span class="p">{</span><span class="n">done</span><span class="p">,</span><span class="mi">128</span><span class="p">,</span>
+      <span class="o">&lt;&lt;</span><span class="s">"fatal: destination path 'darwinkit' already exists and is not an empty directory.</span><span class="se">\n</span><span class="s">"</span><span class="o">&gt;&gt;</span><span class="p">}</span>
+
+<span class="o">&gt;</span> <span class="nn">erlsh</span><span class="p">:</span><span class="nf">run</span><span class="p">([</span><span class="s">"ifconfig"</span><span class="p">],</span> <span class="s">"/tmp/output.log"</span><span class="p">,</span> <span class="s">"/tank/proger/vxz/otp"</span><span class="p">).</span>
+<span class="p">{</span><span class="n">done</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="s">"/tmp/output.log"</span><span class="p">}</span>
+
+<span class="c">% cat /tmp/output.log</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">{{</span><span class="mi">2013</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">28</span><span class="p">},{</span><span class="mi">8</span><span class="p">,</span><span class="mi">39</span><span class="p">,</span><span class="mi">14</span><span class="p">}}</span> <span class="o">/</span><span class="n">sbin</span><span class="o">/</span><span class="n">ifconfig</span>
+<span class="nn">lo0</span><span class="p">:</span> <span class="n">flags</span><span class="o">=</span><span class="mi">8049</span><span class="o">&lt;</span><span class="nv">UP</span><span class="p">,</span><span class="nv">LOOPBACK</span><span class="p">,</span><span class="nv">RUNNING</span><span class="p">,</span><span class="nv">MULTICAST</span><span class="o">&gt;</span> <span class="n">mtu</span> <span class="mi">16384</span>
+    <span class="n">options</span><span class="o">=</span><span class="mi">3</span><span class="o">&lt;</span><span class="nv">RXCSUM</span><span class="p">,</span><span class="nv">TXCSUM</span><span class="o">&gt;</span>
+    <span class="n">inet6</span> <span class="nn">fe80</span><span class="p">::</span><span class="mi">1</span><span class="c">%lo0 prefixlen 64 scopeid 0x1</span>
+    <span class="n">inet</span> <span class="mi">127</span><span class="p">.</span><span class="mi">0</span><span class="p">.</span><span class="mi">0</span><span class="p">.</span><span class="mi">1</span> <span class="n">netmask</span> <span class="mi">0</span><span class="n">xff000000</span>
+    <span class="n">inet6</span> <span class="p">::</span><span class="mi">1</span> <span class="n">prefixlen</span> <span class="mi">128</span>
+<span class="nn">gif0</span><span class="p">:</span> <span class="n">flags</span><span class="o">=</span><span class="mi">8010</span><span class="o">&lt;</span><span class="nv">POINTOPOINT</span><span class="p">,</span><span class="nv">MULTICAST</span><span class="o">&gt;</span> <span class="n">mtu</span> <span class="mi">1280</span>
+<span class="nn">stf0</span><span class="p">:</span> <span class="n">flags</span><span class="o">=</span><span class="mi">0</span><span class="o">&lt;&gt;</span> <span class="n">mtu</span> <span class="mi">1280</span>
+<span class="nn">en0</span><span class="p">:</span> <span class="n">flags</span><span class="o">=</span><span class="mi">8863</span><span class="o">&lt;</span><span class="nv">UP</span><span class="p">,</span><span class="nv">BROADCAST</span><span class="p">,</span><span class="nv">SMART</span><span class="p">,</span><span class="nv">RUNNING</span><span class="p">,</span><span class="nv">SIMPLEX</span><span class="p">,</span><span class="nv">MULTICAST</span><span class="o">&gt;</span> <span class="n">mtu</span> <span class="mi">1500</span>
+    <span class="n">ether</span> <span class="mi">7</span><span class="nn">c</span><span class="p">:</span><span class="nn">d1</span><span class="p">:</span><span class="nn">c3</span><span class="p">:</span><span class="nn">e9</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">65</span>
+    <span class="n">inet6</span> <span class="nn">fe80</span><span class="p">::</span><span class="mi">7</span><span class="nn">ed1</span><span class="p">:</span><span class="nn">c3ff</span><span class="p">:</span><span class="nn">fee9</span><span class="p">:</span><span class="mi">2465</span><span class="c">%en0 prefixlen 64 scopeid 0x4</span>
+    <span class="n">inet</span> <span class="mi">192</span><span class="p">.</span><span class="mi">168</span><span class="p">.</span><span class="mi">63</span><span class="p">.</span><span class="mi">163</span> <span class="n">netmask</span> <span class="mi">0</span><span class="n">xfffffc00</span> <span class="n">broadcast</span> <span class="mi">192</span><span class="p">.</span><span class="mi">168</span><span class="p">.</span><span class="mi">63</span><span class="p">.</span><span class="mi">255</span>
+    <span class="nn">media</span><span class="p">:</span> <span class="n">autoselect</span>
+    <span class="nn">status</span><span class="p">:</span> <span class="n">active</span>
+<span class="nn">p2p0</span><span class="p">:</span> <span class="n">flags</span><span class="o">=</span><span class="mi">8843</span><span class="o">&lt;</span><span class="nv">UP</span><span class="p">,</span><span class="nv">BROADCAST</span><span class="p">,</span><span class="nv">RUNNING</span><span class="p">,</span><span class="nv">SIMPLEX</span><span class="p">,</span><span class="nv">MULTICAST</span><span class="o">&gt;</span> <span class="n">mtu</span> <span class="mi">2304</span>
+    <span class="n">ether</span> <span class="mi">0</span><span class="nn">e</span><span class="p">:</span><span class="nn">d1</span><span class="p">:</span><span class="nn">c3</span><span class="p">:</span><span class="nn">e9</span><span class="p">:</span><span class="mi">24</span><span class="p">:</span><span class="mi">65</span>
+    <span class="nn">media</span><span class="p">:</span> <span class="n">autoselect</span>
+    <span class="nn">status</span><span class="p">:</span> <span class="n">inactive</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="p">{{</span><span class="mi">2013</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">28</span><span class="p">},{</span><span class="mi">8</span><span class="p">,</span><span class="mi">39</span><span class="p">,</span><span class="mi">14</span><span class="p">}}</span> <span class="nb">exit</span> <span class="nn">status</span><span class="p">:</span> <span class="mi">0</span>
+</pre></div>
+
+<h2>
+<a name="fdlink-port" class="anchor" href="#fdlink-port"><span class="octicon octicon-link"></span></a>fdlink Port</h2>
+
+<p>Consider a case of spawning a port that does not actually
+read its standard input (e.g. <code>socat</code> that bridges <code>AF_UNIX</code> with <code>AF_INET</code>):</p>
+
+<pre lang="shell"><code># pstree -A -a $(pgrep make)
+make run
+  `-sh -c...
+      `-beam.smp -- -root /usr/lib/erlang -progname erl -- -home /root -- -pa ebin -config run/sys.config -eval[ok = application:
+          |-socat tcp-listen:32133,reuseaddr,bind=127.0.0.1 unix-connect:/var/run/docker.sock
+          `-16*[{beam.smp}]
+</code></pre>
+
+<p>If you terminate the node, <code>beam</code> will close the port but the process
+will still remain alive (thus, it will leak). To mitigate this issue,
+you can use <code>fdlink</code> that will track <code>stdin</code> availability for you:</p>
+
+<pre lang="shell"><code># pstree -A -a $(pgrep make)
+make run
+  `-sh -c...
+      `-beam.smp -- -root /usr/lib/erlang -progname erl -- -home /root -- -pa ebin -config run/sys.config -eval[ok = application:
+          |-fdlink /usr/bin/socat tcp-listen:32133,reuseaddr,bind=127.0.0.1 unix-connect:/var/run/docker.sock
+          |   `-socat tcp-listen:32133,reuseaddr,bind=127.0.0.1 unix-connect:/var/run/docker.sock
+          `-16*[{beam.smp}]
+</code></pre>
+
+<h3>
+<a name="using" class="anchor" href="#using"><span class="octicon octicon-link"></span></a>Using</h3>
+
+<div class="highlight highlight-erlang"><pre><span class="o">&gt;</span> <span class="nv">Fdlink</span> <span class="o">=</span> <span class="nn">sh</span><span class="p">:</span><span class="nf">fdlink_executable</span><span class="p">().</span>               <span class="c">% make sure your app dir is setup correctly</span>
+<span class="o">&gt;</span> <span class="nv">Fdlink</span> <span class="o">=</span> <span class="nn">filename</span><span class="p">:</span><span class="nf">join</span><span class="p">(</span><span class="s">"./priv"</span><span class="p">,</span> <span class="s">"fdlink"</span><span class="p">).</span>    <span class="c">% in case you're running directly from erlsh root</span>
+<span class="o">&gt;</span> <span class="nn">erlang</span><span class="p">:</span><span class="nb">open_port</span><span class="p">({</span><span class="n">spawn_executable</span><span class="p">,</span> <span class="nv">Fdlink</span><span class="p">},</span> <span class="p">[</span><span class="n">stream</span><span class="p">,</span> <span class="n">exit_status</span><span class="p">,</span> <span class="p">{</span><span class="n">args</span><span class="p">,</span> <span class="p">[</span><span class="s">"/usr/bin/socat"</span><span class="p">|</span><span class="nv">RestOfArgs</span><span class="p">]}).</span>
+</pre></div>
+
+<p><code>fdlink</code> will also close the standard input of its child process.</p>
+
+<h2>
+<a name="credits" class="anchor" href="#credits"><span class="octicon octicon-link"></span></a>Credits</h2>
+
+<ul>
+<li>Vladimir Kirillov</li>
+</ul><p>OM A HUM</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">SH maintained by <a href="https://github.com/synrc">synrc</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
