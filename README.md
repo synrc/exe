@@ -19,40 +19,40 @@ Examples
 ### Onliners
 
 ```erlang
-> erlsh:oneliner(["touch", filename:join("/tmp/", Path)]).
+> sh:oneliner(["touch", filename:join("/tmp/", Path)]).
 {done,0,<<>>}
 
-> erlsh:oneliner("uname -v"). % oneliner/1,2 funs do not include newlines
+> sh:oneliner("uname -v"). % oneliner/1,2 funs do not include newlines
 {done,0,
       <<"Darwin Kernel Version 12.4.0: Wed May  1 17:57:12 PDT 2013; root:xnu-2050.24.15~1/RELEASE_X86_64">>}
 
-> erlsh:oneliner("git describe --always").
+> sh:oneliner("git describe --always").
 {done,128,<<"fatal: Not a valid object name HEAD">>}
 
-> erlsh:oneliner("git describe --always", "/tank/proger/vxz/otp").
+> sh:oneliner("git describe --always", "/tank/proger/vxz/otp").
 {done,0,<<"OTP_R16B01">>}
 ```
 
 ### Escaping
 
 ```erlang
-> Path = erlsh_path:escape("email+=/subdir@example.com").
+> Path = sh_path:escape("email+=/subdir@example.com").
 "email+=%2Fsubdir@example.com"
 ```
 
 ### Run
 
 ```erlang
-> erlsh:run(["git", "clone", "https://github.com/proger/darwinkit.git"], binary, "/tmp").
+> sh:run(["git", "clone", "https://github.com/proger/darwinkit.git"], binary, "/tmp").
 {done,0,<<"Cloning into 'darwinkit'...\n">>}
 
 > UserUrl = "https://github.com/proger/darwinkit.git".
 "https://github.com/proger/darwinkit.git"
-> erlsh:run(["git", "clone", UserUrl], binary, "/tmp").
+> sh:run(["git", "clone", UserUrl], binary, "/tmp").
 {done,128,
       <<"fatal: destination path 'darwinkit' already exists and is not an empty directory.\n">>}
 
-> erlsh:run(["ifconfig"], "/tmp/output.log", "/tank/proger/vxz/otp").
+> sh:run(["ifconfig"], "/tmp/output.log", "/tank/proger/vxz/otp").
 {done,0,"/tmp/output.log"}
 
 % cat /tmp/output.log
