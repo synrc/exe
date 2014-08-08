@@ -6,16 +6,18 @@ oneliner(C) -> run(C, ignoreeol, ".").
 oneliner(C, Cwd) -> run(C, ignoreeol, Cwd).
 run(C) -> run(C, binary, ".").
 run(C, Log) -> run(C, Log, ".").
-
-run([C|Args], Log, Cwd) when is_list(C) ->
-    Executable = case filename:pathtype(C) of
+executable(C) -> 
+    case filename:pathtype(C) of
         absolute -> C;
         relative -> case filename:split(C) of
                 [C] -> os:find_executable(C);
                 _ -> C % smth like deps/sh/priv/fdlink
             end;
         _ -> C
-    end,
+    end.
+
+run([C|Args], Log, Cwd) when is_list(C) ->
+    Executable = executable(C),
     run(Executable, Args, Log, Cwd);
 
 run(Command, Log, Cwd) when is_list(Command) -> run("/bin/sh", ["-c", Command], Log, Cwd).
@@ -26,11 +28,7 @@ run(Command, Args, ignoreeol, Cwd) ->
             {args, Args}, {cd, Cwd}, {line, 16384}]),
     sh_loop(Port, fun({_, Chunk}, Acc) -> [Chunk|Acc] end, []);
 
-run(Command, Args, binary, Cwd) ->
-    Port = erlang:open_port({spawn_executable, Command},
-        [stream, stderr_to_stdout, binary, exit_status,
-            {args, Args}, {cd, Cwd}]),
-    sh_loop(Port, binary);
+run(Command, Args, binary, Cwd) -> run(Command, Args, binary, Cwd, []);
 
 run(Command, Args, Log, Cwd) ->
     {ok, File} = file:open(Log, [append, raw]),
@@ -43,6 +41,12 @@ run(Command, Args, Log, Cwd) ->
     {done, Status, _} = sh_loop(Port, fun(Chunk, _Acc) -> file:write(File, Chunk), [] end, []),
     file:write(File, [">>> ", ts(), " exit status: ", integer_to_list(Status), "\n"]),
     {done, Status, Log}.
+
+run(Command, Args, binary, Cwd, Env) ->
+    Port = erlang:open_port({spawn_executable, executable(Command)},
+        [stream, stderr_to_stdout, binary, exit_status,
+            {args, Args}, {cd, Cwd}, {env, Env}]),
+    sh_loop(Port, binary).
 
 %
 % private functions
