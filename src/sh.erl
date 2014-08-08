@@ -42,18 +42,11 @@ run(Command, Args, Log, Cwd) ->
     file:write(File, [">>> ", ts(), " exit status: ", integer_to_list(Status), "\n"]),
     {done, Status, Log}.
 
-run(Command, Args, binary, Cwd, Env) ->
-<<<<<<< HEAD
-    Port = erlang:open_port({spawn_executable, Command},
-        [stream, stderr_to_stdout, binary, exit_status,
-            {args, Args}, {cd, Cwd}, {env, Env}]),
-    sh_loop(Port, binary);
-=======
+run(Command, Args, Log, Cwd, Env) ->
     Port = erlang:open_port({spawn_executable, executable(Command)},
         [stream, stderr_to_stdout, binary, exit_status,
             {args, Args}, {cd, Cwd}, {env, Env}]),
     sh_loop(Port, binary).
->>>>>>> 4440828d0189801234ed50479ba3ceb288a2a193
 
 %
 % private functions
