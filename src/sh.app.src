@@ -1,6 +1,6 @@
 {application, sh,
  [{description, "VXZ SH Executor"},
-  {vsn, "1"},
+  {vsn, "0.9"},
   {registered, []},
   {applications, [kernel,stdlib]},
   {mod, { sh_app, []}},
