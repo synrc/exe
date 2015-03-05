@@ -1,7 +1,8 @@
 -module(sh).
 -compile(export_all).
 
-fdlink_executable() -> filename:join(code:priv_dir(sh), "fdlink").
+fdlink_executable() -> filename:absname(filename:join(code:priv_dir(sh), "fdlink")).
+%fdlink_executable() -> filename:join(code:priv_dir(sh), "fdlink").
 oneliner(C) -> run(C, ignoreeol, ".").
 oneliner(C, Cwd) -> run(C, ignoreeol, Cwd).
 run(C) -> run(C, binary, ".").
