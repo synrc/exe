@@ -43,7 +43,7 @@ run(Command, Args, Log, Cwd) ->
     file:write(File, [">>> ", ts(), " exit status: ", integer_to_list(Status), "\n"]),
     {done, Status, Log}.
 
-run(Command, Args, Log, Cwd, Env) ->
+run(Command, Args, _Log, Cwd, Env) ->
     Port = erlang:open_port({spawn_executable, executable(Command)},
         [stream, stderr_to_stdout, binary, exit_status,
             {args, Args}, {cd, Cwd}, {env, Env}]),
