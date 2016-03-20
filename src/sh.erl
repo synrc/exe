@@ -16,7 +16,7 @@ executable(C) ->
     end.
 
 run([C|Args], Log, Cwd) when is_list(C)      -> run(executable(C), Args, Log, Cwd);
-run(Command, Log, Cwd) when is_list(Command) -> run("/bin/sh", ["-c", Command], Log, Cwd).
+run(Command, Log, Cwd) when is_list(Command) -> run(executable("sh"), ["-c", Command], Log, Cwd).
 
 run(Command, Args, ignoreeol, Cwd) ->
     Port = erlang:open_port({spawn_executable, Command},

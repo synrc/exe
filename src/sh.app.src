@@ -1,6 +1,6 @@
 {application, sh,
- [{description, "SH VXZ Executor"},
-  {vsn, "1.9"},
+ [{description, "SH External Shell Port"},
+  {vsn, "2.3"},
   {registered, []},
   {applications, [kernel,stdlib]},
   {mod, { sh_app, []}},
