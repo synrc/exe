@@ -1,6 +1,6 @@
 {application, sh,
- [{description, "SH External Shell Port"},
-  {vsn, "2.3"},
+ [{description, "SH Exec"},
+  {vsn, "2.10"},
   {registered, []},
   {applications, [kernel,stdlib]},
   {mod, { sh_app, []}},
