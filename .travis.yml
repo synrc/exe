@@ -3,8 +3,8 @@ otp_release:
   - 19.3
   - 20.3.8
 script:
-  - "rebar get-deps compile"
-  - "rm -rf deps"
   - "curl -fsSL https://raw.github.com/synrc/mad/master/mad > mad"
   - "chmod +x mad"
   - "./mad dep com"
+  - "rm -rf deps"
+  - "rebar get-deps compile"
