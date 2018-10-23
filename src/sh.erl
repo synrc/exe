@@ -1,5 +1,5 @@
 -module(sh).
--export([ fdlink_executable/0, executable/1, oneliner/1, oneliner/2,
+-export([ fdlink_executable/0, executable/1, oneliner/1, oneliner/2, sh_loop/2,
           run/1, run/2, run/3, run/4, run/5 ]). % fold this
 
 fdlink_executable() -> filename:absname(filename:join(code:priv_dir(sh), "fdlink")).
