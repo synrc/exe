@@ -8,7 +8,7 @@ Reason
 ------
 
 ```erlang
-> Email = "hacker+/somepath&reboot#@example.com". % this is a valid email!
+> Email = "hacker+/somepath&reboot#@example.com". % valid email!
 > os:cmd(["mkdir -p ", Email]).
 % path clobbering and a reboot may happen here!
 ```
@@ -22,9 +22,8 @@ Examples
 > sh:oneliner(["touch", filename:join("/tmp/", Path)]).
 {done,0,<<>>}
 
-> sh:oneliner("uname -v"). % oneliner/1,2 funs do not include newlines
-{done,0,
-      <<"Darwin Kernel Version 12.4.0: Wed May  1 17:57:12 PDT 2013; root:xnu-2050.24.15~1/RELEASE_X86_64">>}
+> sh:oneliner("uname -mnprs").
+{done,0,<<"Darwin mac 18.2.0 x86_64 i386">>}
 
 > sh:oneliner("git describe --always").
 {done,128,<<"fatal: Not a valid object name HEAD">>}
@@ -84,34 +83,22 @@ Consider a case of spawning a port that does not actually
 read its standard input (e.g. `socat` that bridges `AF_UNIX` with `AF_INET`):
 
 ```shell
-# pstree -A -a $(pgrep make)
-make run
-  `-sh -c...
-      `-beam.smp -- -root /usr/lib/erlang -progname erl -- -home /root -- -pa ebin -config run/sys.config -eval[ok = application:
-          |-socat tcp-listen:32133,reuseaddr,bind=127.0.0.1 unix-connect:/var/run/docker.sock
-          `-16*[{beam.smp}]
+beam.smp -- -root /usr/lib/erlang -progname erl -- -home /root -- \
+            -pa ebin -config run/sys.config \
+            -socat tcp-listen:32133,reuseaddr,bind=127.0.0.1 \
+            unix-connect:/var/run/docker.sock
 ```
 
 If you terminate the node, `beam` will close the port but the process
 will still remain alive (thus, it will leak). To mitigate this issue,
 you can use `fdlink` that will track `stdin` availability for you:
 
-``` shell
-# pstree -A -a $(pgrep make)
-make run
-  `-sh -c...
-      `-beam.smp -- -root /usr/lib/erlang -progname erl -- -home /root -- -pa ebin -config run/sys.config -eval[ok = application:
-          |-fdlink /usr/bin/socat tcp-listen:32133,reuseaddr,bind=127.0.0.1 unix-connect:/var/run/docker.sock
-          |   `-socat tcp-listen:32133,reuseaddr,bind=127.0.0.1 unix-connect:/var/run/docker.sock
-          `-16*[{beam.smp}]
-```
-
-### Using
+### Usage
 
 ```erlang
-> Fdlink = sh:fdlink_executable().               % make sure your app dir is setup correctly
-> Fdlink = filename:join("./priv", "fdlink").    % in case you're running directly from erlsh root
-> erlang:open_port({spawn_executable, Fdlink}, [stream, exit_status, {args, ["/usr/bin/socat"|RestOfArgs]}).
+> Fdlink = sh:fdlink_executable().
+> erlang:open_port({spawn_executable, Fdlink},
+         [stream, exit_status, {args, ["/usr/bin/socat"|RestOfArgs]}).
 ```
 
 `fdlink` will also close the standard input of its child process.
