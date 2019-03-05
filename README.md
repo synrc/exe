@@ -1,20 +1,16 @@
-SH Executor
-===========
+# sh: your unix gateway
 
-Family of functions and ports involving interacting with the system shell,
-paths and external programs.
+Family of functions and ports to interact with system shell, paths and external programs.
 
-Reason
-------
+## Avoid `os:cmd/1` on user input!
 
 ```erlang
-> Email = "hacker+/somepath&reboot#@example.com". % valid email!
+> Email = "proger+/&reboot%23@hackndev.com". % valid email!
 > os:cmd(["mkdir -p ", Email]).
 % path clobbering and a reboot may happen here!
 ```
 
-Examples
---------
+## Examples
 
 ### Onliners
 
@@ -76,35 +72,35 @@ p2p0: flags=8843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST> mtu 2304
 >>> {{2013,8,28},{8,39,14}} exit status: 0
 ```
 
-fdlink Port
------------
+## fdlink
 
 Consider a case of spawning a port that does not actually
 read its standard input (e.g. `socat` that bridges `AF_UNIX` with `AF_INET`):
 
 ```shell
-beam.smp -- -root /usr/lib/erlang -progname erl -- -home /root -- \
-            -pa ebin -config run/sys.config \
-            -socat tcp-listen:32133,reuseaddr,bind=127.0.0.1 \
-            unix-connect:/var/run/docker.sock
+# pstree -A -a $(pgrep make)
+make run
+  `-sh -c...
+      `-beam.smp -- -root /usr/lib/erlang -progname erl -- -home /root -- -pa ebin -config sys.config
+          |-socat tcp-listen:32133,reuseaddr,bind=127.0.0.1 unix-connect:/var/run/docker.sock
+          `-16*[{beam.smp}]
 ```
 
 If you terminate the node, `beam` will close the port but the process
 will still remain alive (thus, it will leak). To mitigate this issue,
-you can use `fdlink` that will track `stdin` availability for you:
+you can use `fdlink` that tracks `stdin` availability for you:
 
 ### Usage
 
 ```erlang
 > Fdlink = sh:fdlink_executable().
 > erlang:open_port({spawn_executable, Fdlink},
-         [stream, exit_status, {args, ["/usr/bin/socat"|RestOfArgs]}).
+         [stream, exit_status, {args, ["/usr/bin/socat"|Args]}).
 ```
 
 `fdlink` will also close the standard input of its child process.
 
-Credits
--------
+## Credits
 
 * Vladimir Kirillov
 
