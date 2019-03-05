@@ -72,21 +72,19 @@ p2p0: flags=8843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST> mtu 2304
 >>> {{2013,8,28},{8,39,14}} exit status: 0
 ```
 
-## fdlink
+## fdlink: make sure your ports exit when you exit
 
 Consider a case of spawning a port that does not actually
 read its standard input (e.g. `socat` that bridges `AF_UNIX` with `AF_INET`):
 
 ```shell
-# pstree -A -a $(pgrep make)
-make run
-  `-sh -c...
-      `-beam.smp -- -root /usr/lib/erlang -progname erl -- -home /root -- -pa ebin -config sys.config
-          |-socat tcp-listen:32133,reuseaddr,bind=127.0.0.1 unix-connect:/var/run/docker.sock
-          `-16*[{beam.smp}]
+# pstree -A -a $(pgrep beam.smp)
+beam.smp -- -root /usr/lib/erlang -progname erl -- -home /root -- -pa ebin -config sys.config
+  |-socat tcp-listen:32133,reuseaddr,bind=127.0.0.1 unix-connect:/var/run/docker.sock
+  `-16*[{beam.smp}]
 ```
 
-If you terminate the node, `beam` will close the port but the process
+If you terminate the node, beam will close the port but the process
 will still remain alive (thus, it will leak). To mitigate this issue,
 you can use `fdlink` that tracks `stdin` availability for you:
 
