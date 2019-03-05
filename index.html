@@ -111,11 +111,10 @@
           read its standard input (e.g. <b>socat</b> that bridges <b>AF_UNIX</b> with <b>AF_INET</b>):</p>
 
         <figure><code>
- make run
-    `-sh -c...
-        `-beam.smp -- -root /usr/lib/erlang -progname erl -- -home /root -- -pa ebin -config sys.config
-            |-socat tcp-listen:32133,reuseaddr,bind=127.0.0.1 unix-connect:/var/run/docker.sock
-            `-16*[{beam.smp}]
+ # pstree -A -a $(pgrep beam.smp)
+ beam.smp -- -root /usr/lib/erlang -progname erl -- -home /root -- -pa ebin -config sys.config
+   |-socat tcp-listen:32133,reuseaddr,bind=127.0.0.1 unix-connect:/var/run/docker.sock
+   `-16*[{beam.smp}]
         </code></figure>
         <p> If you terminate the node, <b>beam</b. will close the port but the process
             will still remain alive (thus, it will leak). To mitigate this issue,
