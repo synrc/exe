@@ -21,8 +21,8 @@
         <article>
             <section>
                 <h3>SYNOPSIS</h3>
-                <div>SH is a safe executor of external POSIX programs throught Erlang ports.
-                     </div>
+                <div>SH is a family of functions and ports to interact with system shell, paths and external programs.
+                </div>
             <figure><code>
  git clone https://github.com/synrc/sh
             </code></figure>
@@ -38,7 +38,7 @@
         <h3>MOTIVATION</h3>
         <p>Path clobbering and a reboot may happen here even email conforms RFC!</p>
         <figure><code>
- > Email = "hacker+/somepath&reboot#@example.com".
+ > Email = "proger+/&reboot%23@hackndev.com".
  > os:cmd(["mkdir -p ", Email]).
         </code></figure>
         <p>So we can fix this with proper escaping, e.g.:</p>
@@ -108,22 +108,23 @@
     <h3> FDLINK PORT</h3>
 
        <p>Consider a case of spawning a port that does not actually
-          read its standard input (e.g. `socat` that bridges <b>AF_UNIX</b> with <b>AF_INET</b>):</p>
+          read its standard input (e.g. <b>socat</b> that bridges <b>AF_UNIX</b> with <b>AF_INET</b>):</p>
 
         <figure><code>
- beam.smp -- -root /usr/lib/erlang -progname erl -- -home /root -- \
-             -pa ebin -config run/sys.config \
-             -socat tcp-listen:32133,reuseaddr,bind=127.0.0.1 \
-             unix-connect:/var/run/docker.sock
+ make run
+    `-sh -c...
+        `-beam.smp -- -root /usr/lib/erlang -progname erl -- -home /root -- -pa ebin -config sys.config
+            |-socat tcp-listen:32133,reuseaddr,bind=127.0.0.1 unix-connect:/var/run/docker.sock
+            `-16*[{beam.smp}]
         </code></figure>
-        <p> If you terminate the node, `beam` will close the port but the process
+        <p> If you terminate the node, <b>beam</b. will close the port but the process
             will still remain alive (thus, it will leak). To mitigate this issue,
-            you can use `fdlink` that will track `stdin` availability for you:</p>
+            you can use `fdlink` that tracks <b>stdin</b> availability for you:</p>
 
         <figure><code>
  > Fdlink = sh:fdlink_executable().
  > erlang:open_port({spawn_executable, Fdlink},
-   [stream, exit_status, {args, ["/usr/bin/socat"|RestOfArgs]}).
+   [stream, exit_status, {args, ["/usr/bin/socat"|Args]}).
         </code></figure>
         <p><b>fdlink</b> will also close the standard input of its child process.</p>
         <br><br><br>
