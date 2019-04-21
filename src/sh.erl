@@ -1,6 +1,13 @@
 -module(sh).
+-behaviour(supervisor).
+-behaviour(application).
+-export([init/1, start/2, stop/1]).
 -export([ fdlink_executable/0, executable/1, oneliner/1, oneliner/2, sh_loop/2, sh_loop/3, sh_loop/4,
           run/1, run/2, run/3, run/4, run/5 ]). % fold this
+
+start(_StartType, _StartArgs) -> supervisor:start_link({local, ?MODULE}, ?MODULE, []).
+stop(_State) -> ok.
+init([]) -> {ok, { {one_for_one, 5, 10}, []} }.
 
 fdlink_executable() -> filename:absname(filename:join(code:priv_dir(sh), "fdlink")).
 oneliner(C) -> run(C, ignoreeol, ".").
