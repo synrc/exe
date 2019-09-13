@@ -1,26 +1,26 @@
 <html><head><meta charset="utf-8" /><meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="description" content="" /><meta name="author" content="Maxim Sokhatsky" />
-<title>SH</title>
+<title>EXE</title>
 <link rel="stylesheet" href="https://n2o.dev/blank.css" />
 <link rel="stylesheet" href="https://n2o.dev/zima.css" />
 </head><body><nav>
         <a href="https://n2o.dev">DEV</a>
-        <a href="https://sh.n2o.space" style="background:#ededed;">SH</a>
+        <a href="https://sh.n2o.space" style="background:#ededed;">EXE</a>
     </nav><header>
         <a href="https://github.com/synrc/sh"><img src="https://synrc.space/images/Synrc Neo.svg?v=1" /></a>
-        <h1>SH</h1>
+        <h1>EXE</h1>
     </header><aside>
         <article>
             <section>
                 <h3>SYNOPSIS</h3>
-                <div>SH is a family of functions and ports to interact with system shell, paths and external programs.
+                <div>EXE is a family of functions and ports to interact with system shell, paths and external programs.
                 </div><br/>
-            <figure><code> $ mad get sh</code></figure>
+            <figure><code> $ mad get exe</code></figure>
             <br />
             <div>
-                AUG 2014 © <a href="https://github.com/proger">Darkproger</a> ISC
-                VER 2.11 2.10 1.9.1
+                AUG 2014 © <a href="https://github.com/proger">proger</a> ISC
+                VER 3.9.0 2.11 2.10
             </div>
             </section>
         </article>
@@ -36,6 +36,34 @@
         <figure><code>
  > Path = sh_path:escape("email+=/subdir@example.com").
  "email+=%2Fsubdir@example.com"
+        </code></figure>
+        <h3>ESSENCE</h3>
+        <figure><code>
+reduce() -> fun({_, Chunk}, Acc) -> [Chunk|Acc] end.
+
+run(Args) ->
+    erlang:open_port({spawn_executable, os:find_executable("sh")},
+        [stream, in, out, eof, use_stdio, stderr_to_stdout, binary, exit_status,
+            {args, ["-c",Args]}, {cd, element(2,file:get_cwd())}, {env, []}]).
+
+sh(Port) -> sh(Port, reduce(), []).
+sh(Port, Fun, Acc) ->
+  receive
+    {Port, {exit_status, Status}} -> 
+           {done, Status, iolist_to_binary(lists:reverse(Acc))};
+    {Port, {data, {eol, Line}}} ->
+           sh(Port, Fun, Fun({eol, Line}, Acc));
+    {Port, {data, {noeol, Line}}} ->
+           sh(Port, Fun, Fun({noeol, Line}, Acc));
+    {Port, {data, Data}} ->
+           case { binary:match(Data, <<"Sign the certificate? [y/n]:">>) 
+                  =/= nomatch,
+                  binary:match(Data, <<"requests certified, commit?">>)
+                  =/= nomatch} of
+                { true , _} -> Port ! {self(),{command,<<"y\n">>}};
+                { _ , true} -> Port ! {self(),{command,<<"y\n">>}};
+                {_,_}       -> skip end,
+           sh(Port, Fun, Fun({data,Data}, Acc)) end.
         </code></figure>
         <h3>USAGE</h3>
         <p>Family of functions and ports involving interacting with the system shell,
