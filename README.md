@@ -1,5 +1,9 @@
 # sh: your unix gateway
 
+[![Actions Status](https://github.com/synrc/exe/workflows/mix/badge.svg)](https://github.com/synrc/exe/actions)
+[![Build Status](https://travis-ci.org/synrc/exe.svg?branch=master)](https://travis-ci.org/synrc/exe)
+[![Hex pm](http://img.shields.io/hexpm/v/exe.svg?style=flat)](https://hex.pm/packages/exe)
+
 Family of functions and ports to interact with system shell, paths and external programs.
 
 ## Avoid `os:cmd/1` on user input!
