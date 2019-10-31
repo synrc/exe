@@ -10,3 +10,4 @@ script:
   - "./mad dep com"
   - "rm -rf deps"
   - "rebar get-deps clean compile"
+  - "rebar3 dialyzer"
