@@ -1,6 +1,6 @@
 {application, sh,
  [{description, "SH EXE REM SEC"},
-  {vsn, "3.10.0"},
+  {vsn, "4.1.1"},
   {registered, []},
   {applications, [kernel,stdlib]},
   {mod, { sh, []}},
