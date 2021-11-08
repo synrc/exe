@@ -4,7 +4,7 @@ defmodule EXE.Mixfile do
   def application, do: [mod: {:sh, []}]
   def project do
     [ app: :exe,
-      version: "4.1.1",
+      version: "7.11.0",
       description: "EXE Shell Execution",
       package: package(),
       deps: deps()]
