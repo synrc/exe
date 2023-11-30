@@ -2,7 +2,7 @@
 -export([escape/1, unescape/1]).
 
 escape(Path) -> R = reserved(), lists:append([char_encode(Char, R) || Char <- Path]).
-unescape(Str) -> http_uri:decode(Str).
+unescape(Str) -> uri_string:unquote(Str).
 reserved() -> sets:from_list([$/, $\\, $:, $%]).
 char_encode(Char, Reserved) ->
     case sets:is_element(Char, Reserved) of
